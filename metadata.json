@@ -1,0 +1,5 @@
+{
+  "name": "TEAM SHACHI メッセージサイト",
+  "description": "A fan message site for TEAM SHACHI, allowing fans to post 'thank you' messages for the group's final. Messages are displayed in an auto-scrolling feed, with a live counter of submissions.",
+  "requestFramePermissions": []
+}
