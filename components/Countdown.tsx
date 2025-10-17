@@ -26,7 +26,7 @@ const Countdown: React.FC = () => {
     }, []);
 
     return (
-        <section className="text-center my-12 py-8 bg-white/50 rounded-2xl shadow-lg shadow-pink-100/50">
+        <section className="text-center mt-4 mb-12 py-8 bg-white/50 rounded-2xl shadow-lg shadow-pink-100/50">
             <h2 className="text-lg sm:text-xl md:text-2xl font-light text-gray-500 mb-4">
                 TEAM SHACHI ラストライブ
             </h2>
