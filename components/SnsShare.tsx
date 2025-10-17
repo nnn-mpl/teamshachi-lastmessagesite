@@ -1,19 +1,25 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import type { Oshimen } from '../types';
-import { MEMBERS } from '../constants';
 
-interface SnsShareProps {
-    oshimen: Oshimen;
-}
+const SnsShare: React.FC = () => {
+    const message = "TEAM SHACHIにメッセージを届けました💌";
+    const url = "https://shachimessage.vercel.app";
+    const hashtags = [
+        "#シャチハッピーラストイヤー",
+        "#TEAMSHACHI",
+        "#タフ民からシャチのみんなへ"
+    ];
 
-const SnsShare: React.FC<SnsShareProps> = ({ oshimen }) => {
-    const memberHashtag = MEMBERS.find(m => m.name === oshimen)?.hashtag || '';
-    const text = "TEAM SHACHIにメッセージを届けました💌";
-    const url = "https://shachimessage.vercel.app"; // Replace with your actual URL
-    const hashtags = `TEAMSHACHIありがとう,${memberHashtag}`;
+    // To achieve line breaks in the tweet, we'll combine everything into the 'text' parameter.
+    // The \n character will be URL-encoded to create new lines.
+    const fullText = [
+        message,
+        "", // For a blank line between the message and hashtags
+        ...hashtags,
+        url
+    ].join('\n');
     
-    const twitterShareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}&hashtags=${encodeURIComponent(hashtags)}`;
+    const twitterShareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(fullText)}`;
 
     return (
         <motion.div

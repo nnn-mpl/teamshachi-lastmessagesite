@@ -11,12 +11,10 @@ const MessageCard: React.FC<MessageCardProps> = ({ message }) => {
     const borderColor = member?.borderColor.replace('-500', '-300') || 'border-gray-300';
     const bgColor = member?.bgColor.replace('/10', '/20').replace('-500', '-100') || 'bg-gray-50/50';
 
-    const formattedDate = new Date(message.create_at).toLocaleString('ja-JP', {
+    const formattedDate = new Date(message.create_at).toLocaleDateString('ja-JP', {
         year: 'numeric',
         month: '2-digit',
         day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
     });
 
     return (

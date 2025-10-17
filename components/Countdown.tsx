@@ -27,11 +27,20 @@ const Countdown: React.FC = () => {
 
     return (
         <section className="text-center my-12 py-8 bg-white/50 rounded-2xl shadow-lg shadow-pink-100/50">
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-light text-gray-500 leading-relaxed sm:leading-normal">
-                TEAM SHACHI 最終SHOW
-                <br className="sm:hidden" />
-                ～晴れ晴れ～まで
+            <h2 className="text-lg sm:text-xl md:text-2xl font-light text-gray-500 mb-4">
+                TEAM SHACHI ラストライブ
             </h2>
+            
+            <img 
+                src="/logo.png" 
+                alt="TEAM SHACHI 最終SHOW～晴れ晴れ～" 
+                className="mx-auto w-full max-w-md px-4" 
+            />
+
+            <h2 className="text-lg sm:text-xl md:text-2xl font-light text-gray-500 mt-2">
+                まで
+            </h2>
+            
             <div className="flex justify-center items-baseline mt-4 font-yusei text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-amber-400">
                 <div className="flex items-baseline">
                     <span className="text-5xl sm:text-6xl md:text-8xl font-bold">{daysLeft}</span>

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useLayoutEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import type { Message, Oshimen } from '../types';
 import MessageCard from './MessageCard';
@@ -10,21 +10,33 @@ interface MessageListProps {
 
 const MessageList: React.FC<MessageListProps> = ({ messages }) => {
     const [filter, setFilter] = useState<Oshimen | 'ALL'>('ALL');
-    const marqueeRef = useRef<HTMLDivElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const contentRef = useRef<HTMLDivElement>(null); // Ref for the content block to measure
     const [duration, setDuration] = useState(100);
+    const [shouldAnimate, setShouldAnimate] = useState(false);
+    const [contentHeight, setContentHeight] = useState(0);
 
     const filteredMessages = useMemo(() => {
         if (filter === 'ALL') return messages;
         return messages.filter(msg => msg.like_member === filter);
     }, [messages, filter]);
     
-    useEffect(() => {
-        if (marqueeRef.current) {
-            const height = marqueeRef.current.scrollHeight;
-            const calculatedDuration = Math.max(30, filteredMessages.length * 5); 
-            setDuration(calculatedDuration);
+    useLayoutEffect(() => {
+        if (contentRef.current && containerRef.current) {
+            const contentH = contentRef.current.offsetHeight; // Use offsetHeight for accuracy
+            const containerH = containerRef.current.offsetHeight;
+            
+            setContentHeight(contentH); // Store the height of one block
+            const isOverflowing = contentH > containerH;
+            setShouldAnimate(isOverflowing);
+
+            if (isOverflowing) {
+                // Set scroll speed (e.g., 25 pixels per second, was 35)
+                const calculatedDuration = contentH / 25;
+                setDuration(Math.max(30, calculatedDuration));
+            }
         }
-    }, [filteredMessages.length]);
+    }, [filteredMessages]);
 
     const tabs: (Oshimen | 'ALL')[] = ['ALL', ...OSHIMEN_MEMBERS];
     
@@ -59,17 +71,26 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
                 })}
             </div>
 
-            <div className="h-[600px] overflow-hidden relative mask-gradient">
+            <div ref={containerRef} className={`h-[600px] overflow-hidden relative ${shouldAnimate ? 'mask-gradient' : ''}`}>
                 {filteredMessages.length > 0 ? (
                     <motion.div
-                        ref={marqueeRef}
-                        className="space-y-4"
-                        animate={{ y: ['100%', `-${(filteredMessages.length * 150)}px`] }}
-                        transition={{ duration: duration, repeat: Infinity, ease: 'linear' }}
+                        key={filter}
+                        animate={shouldAnimate ? { y: [0, -contentHeight] } : { y: 0 }}
+                        transition={shouldAnimate ? { duration: duration, repeat: Infinity, ease: 'linear' } : { duration: 0 }}
                     >
-                        {filteredMessages.map(msg => (
-                            <MessageCard key={msg.id} message={msg} />
-                        ))}
+                        <div ref={contentRef} className="space-y-4 pb-4">
+                            {filteredMessages.map(msg => (
+                                <MessageCard key={msg.id} message={msg} />
+                            ))}
+                        </div>
+                        {/* Duplicate the content for a seamless loop, only if animating */}
+                        {shouldAnimate && (
+                            <div className="space-y-4 pb-4" aria-hidden="true">
+                                {filteredMessages.map(msg => (
+                                    <MessageCard key={`${msg.id}-clone`} message={msg} />
+                                ))}
+                            </div>
+                        )}
                     </motion.div>
                 ) : (
                     <div className="flex items-center justify-center h-full bg-white/30 rounded-2xl">
@@ -79,8 +100,8 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
             </div>
             <style>{`
               .mask-gradient {
-                -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
-                mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
+                -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 3%, black 97%, transparent 100%);
+                mask-image: linear-gradient(to bottom, transparent 0%, black 3%, black 97%, transparent 100%);
               }
             `}</style>
         </div>

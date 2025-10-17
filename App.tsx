@@ -100,14 +100,16 @@ const App: React.FC = () => {
                 <Countdown />
                 
                 <section id="messages" className="my-16">
-                    <h2 className="text-2xl sm:text-3xl md:text-4xl text-center mb-8 font-yusei text-pink-500">みんなの「好き」と「ありがとう」をシャチへ！</h2>
-                    {isLoading ? (
-                         <div className="text-center">読み込み中...</div>
-                    ) : error ? (
-                        <div className="text-center text-red-500 bg-red-100 p-4 rounded-lg">{error}</div>
-                    ) : (
-                        <MessageList messages={messages} />
-                    )}
+                    <div className="max-w-2xl mx-auto">
+                        <h2 className="text-2xl sm:text-3xl md:text-4xl text-center mb-8 font-yusei text-pink-500">みんなの「大好き」と「ありがとう」をTEAM SHACHIへ！</h2>
+                        {isLoading ? (
+                            <div className="text-center">読み込み中...</div>
+                        ) : error ? (
+                            <div className="text-center text-red-500 bg-red-100 p-4 rounded-lg">{error}</div>
+                        ) : (
+                            <MessageList messages={messages} />
+                        )}
+                    </div>
                 </section>
 
                 <div ref={postFormRef} className="scroll-mt-20">

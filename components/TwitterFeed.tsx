@@ -9,7 +9,7 @@ declare global {
 
 const TwitterFeed: React.FC = () => {
     const twitterUrl = "https://twitter.com/shachi_staff?ref_src=twsrc%5Etfw";
-    const instagramUrl = "https://www.instagram.com/team.shachi/";
+    const instagramUrl = "https://www.instagram.com/teamshachi_official/";
 
     // コンポーネントがマウントされた後に、Twitterのウィジェットを再読み込みする
     useEffect(() => {
@@ -70,7 +70,7 @@ const TwitterFeed: React.FC = () => {
                         </div>
                         <div className="ml-4">
                             <h3 className="font-bold text-gray-800">TEAM SHACHI (Official)</h3>
-                            <a href={instagramUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-500 hover:underline">@team.shachi</a>
+                            <a href={instagramUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-500 hover:underline">@teamshachi_official</a>
                         </div>
                     </div>
                     <div className="min-h-[400px] flex-grow flex flex-col items-center justify-center bg-gray-50/50 rounded-lg p-4 text-center">
