@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FINAL_DATE } from '../constants';
+import logoSrc from '/logo.png'; // 画像をインポート
 
 const Countdown: React.FC = () => {
     const [daysLeft, setDaysLeft] = useState(0);
@@ -32,7 +33,7 @@ const Countdown: React.FC = () => {
             </h2>
             
             <img 
-                src="/logo.png" 
+                src={logoSrc} 
                 alt="TEAM SHACHI 最終SHOW～晴れ晴れ～" 
                 className="mx-auto w-full max-w-md px-4" 
             />
