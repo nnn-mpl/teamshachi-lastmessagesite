@@ -22,15 +22,19 @@ const App: React.FC = () => {
     };
 
     const fetchMessages = useCallback(async () => {
-        const { data, error } = await supabase
+        const { data, error: fetchError } = await supabase
             .from('messages')
             .select('*')
             .neq('delete_flg', '1')
             .order('create_at', { ascending: false });
 
-        if (error) {
-            console.error('Error fetching messages:', error);
-            setError('メッセージの読み込みに失敗しました。');
+        if (fetchError) {
+            console.error('Error fetching messages:', fetchError);
+            let errorMessage = 'メッセージの読み込みに失敗しました。';
+            if (fetchError.message.includes('security policies') || fetchError.message.includes('permission denied')) {
+                errorMessage += ' データへのアクセス権限がないようです。SupabaseのRow Level Security (RLS)設定を確認してください。';
+            }
+            setError(errorMessage);
             setMessages([]);
         } else {
             setMessages(data || []);
@@ -38,13 +42,14 @@ const App: React.FC = () => {
     }, []);
 
     const fetchCount = useCallback(async () => {
-        const { count, error } = await supabase
+        const { count, error: countError } = await supabase
             .from('messages')
             .select('*', { count: 'exact', head: true })
             .neq('delete_flg', '1');
 
-        if (error) {
-            console.error('Error fetching count:', error);
+        if (countError) {
+            console.error('Error fetching count:', countError);
+             // メインのエラー表示に影響を与えないよう、ここではUIエラーを更新しない
         } else {
             setTotalMessages(count || 0);
         }
@@ -99,7 +104,7 @@ const App: React.FC = () => {
                     {isLoading ? (
                          <div className="text-center">読み込み中...</div>
                     ) : error ? (
-                        <div className="text-center text-red-500">{error}</div>
+                        <div className="text-center text-red-500 bg-red-100 p-4 rounded-lg">{error}</div>
                     ) : (
                         <MessageList messages={messages} />
                     )}
