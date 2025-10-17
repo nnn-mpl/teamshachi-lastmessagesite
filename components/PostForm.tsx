@@ -20,10 +20,15 @@ const PostForm: React.FC<PostFormProps> = ({ onPostSuccess, isConfigured }) => {
     const [lastSubmittedOshimen, setLastSubmittedOshimen] = useState<Oshimen | null>(null);
     const [showShare, setShowShare] = useState(false);
 
+    const NICKNAME_MAX_LENGTH = 30;
+    const MESSAGE_MAX_LENGTH = 450;
+
     const validateForm = () => {
         if (!name.trim()) return 'ニックネームを入力してください。';
+        if (name.length > NICKNAME_MAX_LENGTH) return `ニックネームは${NICKNAME_MAX_LENGTH}文字以内で入力してください。`;
         if (!oshimen) return '推しメンを選択してください。';
         if (!message.trim()) return 'メッセージを入力してください。';
+        if (message.length > MESSAGE_MAX_LENGTH) return `メッセージは${MESSAGE_MAX_LENGTH}文字以内で入力してください。`;
         
         const foundNGWord = NG_WORDS.find(word => message.includes(word));
         if (foundNGWord) {
@@ -75,8 +80,8 @@ const PostForm: React.FC<PostFormProps> = ({ onPostSuccess, isConfigured }) => {
     return (
         <section id="post-form" className="my-16 p-6 sm:p-8 bg-white rounded-2xl shadow-xl shadow-pink-100/50 max-w-2xl mx-auto border border-gray-200">
             <h2 className="text-2xl sm:text-3xl md:text-4xl text-center mb-6 font-yusei text-pink-500">ありがとうと好きを届けよう</h2>
-            <form onSubmit={handleSubmit} className="space-y-8">
-                <fieldset disabled={!isConfigured} className="space-y-8">
+            <form onSubmit={handleSubmit} className="space-y-6">
+                <fieldset disabled={!isConfigured} className="space-y-6">
                     <div>
                         <label htmlFor="name" className="block text-sm font-medium text-gray-500 mb-1">ニックネーム</label>
                         <input
@@ -87,7 +92,11 @@ const PostForm: React.FC<PostFormProps> = ({ onPostSuccess, isConfigured }) => {
                             className="w-full bg-transparent border-0 border-b-2 border-gray-200 focus:ring-0 focus:border-pink-300 transition disabled:opacity-50"
                             placeholder="ニックネーム"
                             required
+                            maxLength={NICKNAME_MAX_LENGTH + 5} // Allow typing a bit over to show error
                         />
+                        <div className={`text-right text-xs mt-1 ${name.length > NICKNAME_MAX_LENGTH ? 'text-red-500 font-bold' : 'text-gray-400'}`}>
+                            {name.length}/{NICKNAME_MAX_LENGTH}
+                        </div>
                     </div>
                     <div>
                         <label htmlFor="oshimen" className="block text-sm font-medium text-gray-500 mb-1">推しメン</label>
@@ -114,7 +123,11 @@ const PostForm: React.FC<PostFormProps> = ({ onPostSuccess, isConfigured }) => {
                             className="w-full bg-amber-50/50 border-2 border-gray-200 rounded-md px-4 py-2 focus:ring-2 focus:ring-pink-300 focus:border-pink-300 outline-none transition disabled:opacity-50"
                             placeholder="TEAM SHACHIへの感謝の気持ち、メンバーの好きなところ、伝えたい想いを自由に書いてください！"
                             required
+                            maxLength={MESSAGE_MAX_LENGTH + 10} // Allow typing a bit over to show error
                         ></textarea>
+                        <div className={`text-right text-xs mt-1 ${message.length > MESSAGE_MAX_LENGTH ? 'text-red-500 font-bold' : 'text-gray-400'}`}>
+                            {message.length}/{MESSAGE_MAX_LENGTH}
+                        </div>
                     </div>
                 </fieldset>
                 
@@ -141,7 +154,7 @@ const PostForm: React.FC<PostFormProps> = ({ onPostSuccess, isConfigured }) => {
                     )}
                 </AnimatePresence>
 
-                <div className="text-center">
+                <div className="text-center pt-2">
                     <button
                         type="submit"
                         disabled={isSubmitting || !isConfigured}
