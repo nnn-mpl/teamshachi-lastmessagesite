@@ -49,11 +49,11 @@ const App: React.FC = () => {
         }
     }, []);
 
-    const handlePostSuccess = useCallback(() => {
+    const handlePostSuccess = useCallback((newMessage: Message) => {
         if (!isSupabaseConfigured) return;
-        fetchMessages();
-        fetchCount();
-    }, [fetchMessages, fetchCount]);
+        setMessages(prevMessages => [newMessage, ...prevMessages]);
+        setTotalMessages(prevCount => prevCount + 1);
+    }, []);
 
     useEffect(() => {
         if (!isSupabaseConfigured) {

@@ -7,7 +7,7 @@ import MessageCard from './MessageCard';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface PostFormProps {
-    onPostSuccess: () => void;
+    onPostSuccess: (newMessage: Message) => void;
     isConfigured: boolean;
 }
 
@@ -51,20 +51,25 @@ const PostForm: React.FC<PostFormProps> = ({ onPostSuccess, isConfigured }) => {
     };
     
     const handleConfirmPost = async () => {
+        if (isSubmitting) {
+            return;
+        }
         setShowPreview(false);
         setError(null);
         setSuccessMessage(null);
         setShowShare(false);
 
         setIsSubmitting(true);
-        const { error: insertError } = await supabase
+        const { data, error: insertError } = await supabase
             .from('messages')
             .insert([{ 
                 nickname: name, 
                 like_member: oshimen, 
                 message,
                 delete_flg: '0' 
-            }]);
+            }])
+            .select()
+            .single();
         
         setIsSubmitting(false);
 
@@ -77,7 +82,9 @@ const PostForm: React.FC<PostFormProps> = ({ onPostSuccess, isConfigured }) => {
             setName('');
             setOshimen('');
             setMessage('');
-            onPostSuccess();
+            if (data) {
+                onPostSuccess(data as Message);
+            }
             setShowShare(true);
             setTimeout(() => setSuccessMessage(null), 5000);
         }

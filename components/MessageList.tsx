@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useLayoutEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import type { Message, Oshimen } from '../types';
 import MessageCard from './MessageCard';
@@ -10,40 +10,50 @@ interface MessageListProps {
 
 const MessageList: React.FC<MessageListProps> = ({ messages }) => {
     const [filter, setFilter] = useState<Oshimen | 'ALL'>('ALL');
+    const containerRef = useRef<HTMLDivElement>(null);
     const marqueeRef = useRef<HTMLDivElement>(null);
+    const contentRef = useRef<HTMLDivElement>(null); // 実際のコンテンツの高さを測るためのRef
     const [animationProps, setAnimationProps] = useState<{ y: number[], duration: number } | null>(null);
+    const [isOverflowing, setIsOverflowing] = useState(false);
 
     const filteredMessages = useMemo(() => {
         if (filter === 'ALL') return messages;
         return messages.filter(msg => msg.like_member === filter);
     }, [messages, filter]);
     
-    useEffect(() => {
-        // フィルターが変更されたときにアニメーションをリセット
-        setAnimationProps(null);
+    // 1. メッセージリストが更新されたときに、オーバーフロー状態を決定する
+    useLayoutEffect(() => {
+        if (containerRef.current && contentRef.current) {
+            const contentHeight = contentRef.current.offsetHeight;
+            const containerHeight = containerRef.current.offsetHeight;
+            const newIsOverflowing = contentHeight > containerHeight;
 
-        // DOMの更新後に高さを測定するため、setTimeoutで処理を遅延させる
-        const timer = setTimeout(() => {
-            if (marqueeRef.current && marqueeRef.current.parentElement) {
-                // コンテンツは2倍になっているので、その半分の高さを取得
-                const contentHeight = marqueeRef.current.scrollHeight / 2;
-                const containerHeight = marqueeRef.current.parentElement.offsetHeight;
-
-                // コンテンツがコンテナより大きい場合のみアニメーションを実行
-                if (contentHeight > containerHeight && contentHeight > 0) {
-                    const speed = 40; // pixels per second
-                    const duration = contentHeight / speed;
-                    
-                    setAnimationProps({
-                        y: [0, -contentHeight], // 上にスクロールさせる
-                        duration: duration,
-                    });
-                }
+            if (newIsOverflowing !== isOverflowing) {
+                setIsOverflowing(newIsOverflowing);
             }
-        }, 0);
+        }
+    }, [filteredMessages, isOverflowing]);
 
-        return () => clearTimeout(timer);
-    }, [filteredMessages]);
+    // 2. オーバーフロー状態が確定した後に、アニメーションを設定する
+    useLayoutEffect(() => {
+        if (isOverflowing && contentRef.current) {
+            const contentHeight = contentRef.current.offsetHeight;
+            if (contentHeight > 0) {
+                const speed = 40; // pixels per second
+                const scrollDistance = contentHeight + 16; // pt-4 = 1rem = 16px
+                const duration = scrollDistance / speed;
+                
+                setAnimationProps({
+                    y: [0, -scrollDistance],
+                    duration: duration,
+                });
+            }
+        } else {
+            // オーバーフローしていない場合はアニメーションを停止
+            setAnimationProps(null);
+        }
+    }, [isOverflowing, filteredMessages]);
+
 
     const tabs: (Oshimen | 'ALL')[] = ['ALL', ...OSHIMEN_MEMBERS];
     
@@ -78,30 +88,35 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
                 })}
             </div>
 
-            <div className="h-[600px] overflow-hidden relative mask-gradient">
+            <div ref={containerRef} className="h-[600px] overflow-hidden relative mask-gradient">
                 {filteredMessages.length > 0 ? (
                     <motion.div
                         ref={marqueeRef}
-                        key={filter} // Resets component state and animation when filter changes
+                        // メッセージ数やフィルターが変わったらコンポーネントをリセットしてアニメーションを最初から開始
+                        key={`${filter}-${filteredMessages.length}`}
                         animate={animationProps ? { y: animationProps.y } : { y: 0 }}
                         transition={animationProps ? { 
                             duration: animationProps.duration, 
                             repeat: Infinity,
                             repeatType: 'loop', // シームレスなループのために 'loop' を指定
                             ease: 'linear' 
-                        } : {}}
+                        } : { duration: 0 }}
                     >
-                        {/* 無限スクロールのためにメッセージリストを2回レンダリング */}
-                        <div className="space-y-4">
+                        {/* 常に1つ目のリストは描画し、高さを測定する */}
+                        <div ref={contentRef} className="space-y-4">
                           {filteredMessages.map(msg => (
                               <MessageCard key={msg.id} message={msg} />
                           ))}
                         </div>
-                        <div className="space-y-4 pt-4">
-                          {filteredMessages.map(msg => (
-                              <MessageCard key={`${msg.id}-clone`} message={msg} />
-                          ))}
-                        </div>
+                        
+                        {/* オーバーフローしている場合のみ、無限スクロール用の複製リストを描画 */}
+                        {isOverflowing && (
+                          <div className="space-y-4 pt-4">
+                            {filteredMessages.map(msg => (
+                                <MessageCard key={`${msg.id}-clone`} message={msg} />
+                            ))}
+                          </div>
+                        )}
                     </motion.div>
                 ) : (
                     <div className="flex items-center justify-center h-full bg-white/30 rounded-2xl">
