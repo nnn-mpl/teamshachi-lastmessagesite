@@ -88,7 +88,7 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
                 })}
             </div>
 
-            <div ref={containerRef} className="h-[600px] overflow-hidden relative mask-gradient">
+            <div ref={containerRef} className={`h-[600px] overflow-hidden relative ${isOverflowing ? 'mask-gradient' : ''}`}>
                 {filteredMessages.length > 0 ? (
                     <motion.div
                         ref={marqueeRef}
