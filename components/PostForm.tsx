@@ -73,7 +73,7 @@ const PostForm: React.FC<PostFormProps> = ({ onPostSuccess, isConfigured }) => {
     };
 
     return (
-        <section id="post-form" className="my-16 p-6 sm:p-8 bg-white rounded-2xl shadow-xl shadow-pink-100/50 max-w-2xl mx-auto border border-gray-200">
+        <section id="post-form" className="mt-12 p-6 sm:p-8 bg-white rounded-2xl shadow-xl shadow-pink-100/50 max-w-2xl mx-auto border border-gray-200">
             <h2 className="text-2xl sm:text-3xl md:text-4xl text-center mb-6 font-yusei text-pink-500 leading-relaxed">TEAM SHACHIへ<br />愛と感謝を届けよう</h2>
             <form onSubmit={handleSubmit} className="space-y-8">
                 <fieldset disabled={!isConfigured} className="space-y-8">

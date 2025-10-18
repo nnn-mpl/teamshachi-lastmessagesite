@@ -93,7 +93,7 @@ const App: React.FC = () => {
                 
                 <Countdown />
                 
-                <section id="messages" className="my-16 max-w-2xl mx-auto">
+                <section id="messages" className="mt-16 max-w-2xl mx-auto">
                     <h2 className="text-2xl sm:text-3xl md:text-4xl text-center mb-8 font-yusei text-pink-500 leading-relaxed">みんなの「好き」と<br />「ありがとう」をシャチへ！</h2>
                     {isLoading ? (
                          <div className="text-center">読み込み中...</div>
