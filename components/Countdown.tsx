@@ -32,7 +32,7 @@ const Countdown: React.FC = () => {
                     TEAM SHACHI ラストライブ
                 </h3>
                 <img
-                    src="/logo.png"
+                    src="/image/logo.png"
                     alt="TEAM SHACHI 最終SHOW ～晴れ晴れ～"
                     className="mx-auto w-full max-w-md mb-2"
                 />
