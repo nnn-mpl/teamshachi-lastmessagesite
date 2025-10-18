@@ -24,8 +24,10 @@ const PostForm: React.FC<PostFormProps> = ({ onPostSuccess, isConfigured }) => {
 
     const validateForm = () => {
         if (!name.trim()) return 'ニックネームを入力してください。';
+        if (name.length > 30) return 'ニックネームは30文字以内で入力してください。';
         if (!oshimen) return '推しメンを選択してください。';
         if (!message.trim()) return 'メッセージを入力してください。';
+        if (message.length > 300) return 'メッセージは300文字以内で入力してください。';
         
         const foundNGWord = NG_WORDS.find(word => message.includes(word));
         if (foundNGWord) {
@@ -88,7 +90,12 @@ const PostForm: React.FC<PostFormProps> = ({ onPostSuccess, isConfigured }) => {
                 <form onSubmit={handleSubmit} className="space-y-8">
                     <fieldset disabled={!isConfigured} className="space-y-8">
                         <div>
-                            <label htmlFor="name" className="block text-sm font-medium text-gray-500 mb-1">ニックネーム</label>
+                            <label htmlFor="name" className="flex justify-between items-baseline text-sm font-medium text-gray-500 mb-1">
+                                <span>ニックネーム</span>
+                                <span className={`text-xs font-mono ${name.length > 30 ? 'text-red-500' : 'text-gray-400'}`}>
+                                    {name.length} / 30
+                                </span>
+                            </label>
                             <input
                                 id="name"
                                 type="text"
@@ -97,6 +104,7 @@ const PostForm: React.FC<PostFormProps> = ({ onPostSuccess, isConfigured }) => {
                                 className="w-full bg-transparent border-0 border-b-2 border-gray-200 focus:ring-0 focus:border-pink-300 transition disabled:opacity-50"
                                 placeholder="ニックネーム"
                                 required
+                                maxLength={30}
                             />
                         </div>
                         <div>
@@ -115,7 +123,12 @@ const PostForm: React.FC<PostFormProps> = ({ onPostSuccess, isConfigured }) => {
                             </select>
                         </div>
                         <div>
-                            <label htmlFor="message" className="block text-sm font-medium text-gray-500 mb-1">メッセージ</label>
+                            <label htmlFor="message" className="flex justify-between items-baseline text-sm font-medium text-gray-500 mb-1">
+                                <span>メッセージ</span>
+                                <span className={`text-xs font-mono ${message.length > 300 ? 'text-red-500' : 'text-gray-400'}`}>
+                                    {message.length} / 300
+                                </span>
+                            </label>
                             <textarea
                                 id="message"
                                 value={message}
@@ -124,6 +137,7 @@ const PostForm: React.FC<PostFormProps> = ({ onPostSuccess, isConfigured }) => {
                                 className="w-full bg-amber-50/50 border-2 border-gray-200 rounded-md px-4 py-2 focus:ring-2 focus:ring-pink-300 focus:border-pink-300 outline-none transition disabled:opacity-50"
                                 placeholder="TEAM SHACHIへの感謝の気持ち、メンバーの好きなところ、伝えたい想いを自由に書いてください！"
                                 required
+                                maxLength={300}
                             ></textarea>
                         </div>
                     </fieldset>
