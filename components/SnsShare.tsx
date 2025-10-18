@@ -8,7 +8,7 @@ interface SnsShareProps {
 
 const SnsShare: React.FC<SnsShareProps> = ({ oshimen }) => {
     const text = "TEAM SHACHIにメッセージを届けました💌";
-    const url = "https://shachimessage.vercel.app"; // Replace with your actual URL
+    const url = "https://teamshachi-lastmessagesite.vercel.app/"; // Replace with your actual URL
     const hashtags = "シャチハッピーラストイヤー,TEAMSHACHI,タフ民からシャチのみんなへ";
     
     const twitterShareUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}&hashtags=${encodeURIComponent(hashtags)}`;
