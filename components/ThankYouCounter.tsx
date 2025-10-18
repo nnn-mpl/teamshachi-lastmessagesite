@@ -20,7 +20,7 @@ const ThankYouCounter: React.FC<ThankYouCounterProps> = ({ count }) => {
     }, [spring, count, isInView]);
 
     return (
-        <section ref={ref} className="text-center my-12 py-8 bg-white/50 rounded-2xl shadow-lg shadow-pink-100/50">
+        <section ref={ref} className="text-center my-12 py-8 bg-white/50 rounded-2xl shadow-lg shadow-pink-100/50 max-w-2xl mx-auto">
             <h3 className="text-lg md:text-2xl font-light text-gray-500">
                 いままで届いたメッセージ
             </h3>
