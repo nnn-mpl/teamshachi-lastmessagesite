@@ -11,8 +11,7 @@ interface MessageListProps {
 const MessageList: React.FC<MessageListProps> = ({ messages }) => {
     const [filter, setFilter] = useState<Oshimen | 'ALL'>('ALL');
     const containerRef = useRef<HTMLDivElement>(null);
-    const marqueeRef = useRef<HTMLDivElement>(null);
-    const contentRef = useRef<HTMLDivElement>(null); // 実際のコンテンツの高さを測るためのRef
+    const contentRef = useRef<HTMLDivElement>(null);
     const [animationProps, setAnimationProps] = useState<{ y: number[], duration: number } | null>(null);
     const [isOverflowing, setIsOverflowing] = useState(false);
 
@@ -21,24 +20,17 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
         return messages.filter(msg => msg.like_member === filter);
     }, [messages, filter]);
     
-    // 1. メッセージリストが更新されたときに、オーバーフロー状態を決定する
     useLayoutEffect(() => {
-        if (containerRef.current && contentRef.current) {
+        const calculateAnimation = () => {
+            if (!containerRef.current || !contentRef.current) return;
+
             const contentHeight = contentRef.current.offsetHeight;
             const containerHeight = containerRef.current.offsetHeight;
-            const newIsOverflowing = contentHeight > containerHeight;
+            const shouldOverflow = contentHeight > containerHeight;
 
-            if (newIsOverflowing !== isOverflowing) {
-                setIsOverflowing(newIsOverflowing);
-            }
-        }
-    }, [filteredMessages, isOverflowing]);
+            setIsOverflowing(shouldOverflow);
 
-    // 2. オーバーフロー状態が確定した後に、アニメーションを設定する
-    useLayoutEffect(() => {
-        if (isOverflowing && contentRef.current) {
-            const contentHeight = contentRef.current.offsetHeight;
-            if (contentHeight > 0) {
+            if (shouldOverflow) {
                 const speed = 40; // pixels per second
                 const scrollDistance = contentHeight + 16; // pt-4 = 1rem = 16px
                 const duration = scrollDistance / speed;
@@ -47,12 +39,22 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
                     y: [0, -scrollDistance],
                     duration: duration,
                 });
+            } else {
+                setAnimationProps(null);
             }
-        } else {
-            // オーバーフローしていない場合はアニメーションを停止
-            setAnimationProps(null);
+        };
+
+        // 初回計算と、フォント読み込みなどによる高さの変更を監視
+        const resizeObserver = new ResizeObserver(calculateAnimation);
+        if (contentRef.current) {
+            resizeObserver.observe(contentRef.current);
         }
-    }, [isOverflowing, filteredMessages]);
+
+        // クリーンアップ関数
+        return () => {
+            resizeObserver.disconnect();
+        };
+    }, [filteredMessages]);
 
 
     const tabs: (Oshimen | 'ALL')[] = ['ALL', ...OSHIMEN_MEMBERS];
@@ -91,7 +93,6 @@ const MessageList: React.FC<MessageListProps> = ({ messages }) => {
             <div ref={containerRef} className={`h-[600px] overflow-hidden relative ${isOverflowing ? 'mask-gradient' : ''}`}>
                 {filteredMessages.length > 0 ? (
                     <motion.div
-                        ref={marqueeRef}
                         // メッセージ数やフィルターが変わったらコンポーネントをリセットしてアニメーションを最初から開始
                         key={`${filter}-${filteredMessages.length}`}
                         animate={animationProps ? { y: animationProps.y } : { y: 0 }}
